@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.prolancer.core.mapper.LoginUserMapper">
+
+    <resultMap id="LoginUserResultMap" type="LoginUserVo">
+        <result column="USER_ID" property="username" />
+        <result column="PASSWORD" property="password" />
+    </resultMap>
+
+    <select id="selectUserByUsername" parameterType="String" resultMap="LoginUserResultMap">
+        SELECT USER_ID
+             , PASSWORD
+          FROM TB_USER
+         WHERE USER_ID = #{username}
+    </select>
+    
+    <select id="selectRoleByUsername" parameterType="String" resultType="org.springframework.security.core.authority.SimpleGrantedAuthority">
+		SELECT CONCAT(D.HTTP_METHOD, ':', D.HTTP_URI) AS ROLE_NAME
+		  FROM TB_USER A
+		  	INNER JOIN TB_USER_ROLE_MAP B
+		  			ON A.USER_ID = B.USER_ID
+		  	INNER JOIN TB_ROLE_GROUP C
+		  			ON B.ROLE_GROUP_ID = C.ROLE_GROUP_ID 
+		  	INNER JOIN TB_ROLE D
+		  			ON C.ROLE_ID = D.ROLE_ID
+		 WHERE A.USER_ID = #{username}
+    </select>
+</mapper>

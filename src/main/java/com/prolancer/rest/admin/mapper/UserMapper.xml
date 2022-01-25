@@ -1,0 +1,15 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.prolancer.rest.admin.mapper.UserMapper">
+
+    <select id="selectUserInfo" parameterType="ReqUserVo" resultType="ResUserVo">
+        SELECT /* com.prolancer.web.admin.mapper.UserMapper.selectUserInfo */
+               USER_ID AS USERNAME
+             , PASSWORD
+          FROM TB_USER
+         WHERE USER_ID = #{username}
+    </select>
+
+</mapper>

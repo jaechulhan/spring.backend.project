@@ -1,0 +1,34 @@
+## Spring Configuration
+spring:
+  profiles:
+    active: local
+  datasource: ## Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
+    url: jdbc:mysql://localhost:3306/prolancer?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC 
+    username: prolancer
+    password: prolancer123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+## myBatis Configuration
+mybatis:
+  type-handlers-package: com.prolancer.core.common.config
+  typeAliasesPackage: com.prolancer.core.entity,com.prolancer.rest.admin.entity
+  mapper-locations: classpath*:com/prolancer/**/mappers/*.xml
+
+## Server Configuration
+server:
+  port: 48080
+
+## Logging Level
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
