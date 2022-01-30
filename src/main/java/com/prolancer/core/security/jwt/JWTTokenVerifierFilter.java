@@ -17,6 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.prolancer.core.common.constant.CommonValue;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -77,50 +79,53 @@ public class JWTTokenVerifierFilter extends OncePerRequestFilter {
 		}
 		*/
 
-		accessToken = authorizationHeader.replace(systemProperties.getJwtTokenPrefix(), "");
-		logger.info("[HEADER] access_token : {}", accessToken);
-		
-		try {
-			String decryptedAccessToken = SecurityCipher.decrypt(accessToken);
-			
-			Jws<Claims> claimsJws = Jwts.parserBuilder()
-				    .setSigningKey(systemProperties.secretKey())
-				    .build() 
-				    .parseClaimsJws(decryptedAccessToken);
-			
-			Claims body = claimsJws.getBody();
-			
-			String username = body.getSubject();
-			
-			@SuppressWarnings("unchecked")
-			List<Map<String, String>> authorities = (List<Map<String, String>>) body.get("authorities");
-			
-			Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream()
+		String[] excluded = new String[] { CommonValue.REST_API_PREFIX.concat("/auth"), CommonValue.REST_API_PREFIX.concat("/auth/refresh_token") };
+		if (ArrayUtils.contains(excluded, request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+		} else {
+			accessToken = authorizationHeader.replace(systemProperties.getJwtTokenPrefix(), "");
+			logger.info("[HEADER] access_token : {}", accessToken);
+
+			try {
+				String decryptedAccessToken = SecurityCipher.decrypt(accessToken);
+
+				Jws<Claims> claimsJws = Jwts.parserBuilder()
+						.setSigningKey(systemProperties.secretKey())
+						.build()
+						.parseClaimsJws(decryptedAccessToken);
+
+				Claims body = claimsJws.getBody();
+
+				String username = body.getSubject();
+
+				@SuppressWarnings("unchecked")
+				List<Map<String, String>> authorities = (List<Map<String, String>>) body.get("authorities");
+
+				Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream()
 						.map(m -> new SimpleGrantedAuthority(m.get("authority")))
 						.collect(Collectors.toSet());
-			
-			Authentication authentication = new UsernamePasswordAuthenticationToken(
-					username, 
-					null,
-					simpleGrantedAuthorities
-			);
-			
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			
-			filterChain.doFilter(request, response);
-		} catch (IllegalArgumentException | JwtException e) {
-			// Response : Header + JSON Body
-			PrintWriter out = response.getWriter();
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-			ExceptionResponse exceptionResponse = new ExceptionResponse("Token Validation Error", accessToken, new Date());
-			String responseJson = new ObjectMapper().writeValueAsString(exceptionResponse);
-			out.print(responseJson);
-			out.flush();
-			return;
+
+				Authentication authentication = new UsernamePasswordAuthenticationToken(
+						username,
+						null,
+						simpleGrantedAuthorities
+				);
+
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+
+				filterChain.doFilter(request, response);
+			} catch (IllegalArgumentException | JwtException e) {
+				// Response : Header + JSON Body
+				PrintWriter out = response.getWriter();
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+				response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				ExceptionResponse exceptionResponse = new ExceptionResponse("Token Validation Error", accessToken, new Date());
+				String responseJson = new ObjectMapper().writeValueAsString(exceptionResponse);
+				out.print(responseJson);
+				out.flush();
+				return;
+			}
 		}
-
 	}
-
 }

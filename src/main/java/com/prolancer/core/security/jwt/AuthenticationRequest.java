@@ -12,10 +12,6 @@ public class AuthenticationRequest {
 	private String username;
 	private String password;
 	
-	/**
-	 * @param username
-	 * @param password
-	 */
 	public AuthenticationRequest() {
 	}
 

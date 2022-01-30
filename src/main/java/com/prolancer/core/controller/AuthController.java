@@ -43,7 +43,7 @@ public class AuthController {
 	@Autowired
 	JWTTokenProvider jWTTokenProvider;
 
-	@RequestMapping(value = "/refresh_token", method=RequestMethod.POST)
+	@RequestMapping(value = "/refresh_token", method=RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, Object> param) {
         Map<String, String> resMap = new HashMap<String, String>();
         

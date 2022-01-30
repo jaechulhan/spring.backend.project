@@ -20,7 +20,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	/**
 	 * @param authInterceptor
-	 * @param objectMapper
 	 */
 	public WebMvcConfig(AuthInterceptor authInterceptor) {
 		this.authInterceptor = authInterceptor;

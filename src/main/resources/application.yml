@@ -16,7 +16,7 @@ spring:
 
 ## myBatis Configuration
 mybatis:
-  type-handlers-package: com.prolancer.core.common.config
+  type-handlers-package: com.prolancer.core.common.mybatis
   typeAliasesPackage: com.prolancer.core.entity,com.prolancer.rest.admin.entity
   mapper-locations: classpath*:com/prolancer/**/mappers/*.xml
 

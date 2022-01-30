@@ -59,12 +59,6 @@ public class HttpSecurityConfig {
 	@Configuration
 	@Order(1)
 	public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
-		/**
-		 * @param passwordEncoder
-		 * @param loginUserService
-		 * @param jwtConfig
-		 * @param jwtSecretKey
-		 */
 		@Autowired
 		public ApiSecurityConfig() {
 		}
